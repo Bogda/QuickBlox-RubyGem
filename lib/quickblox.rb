@@ -506,7 +506,7 @@ class Quickblox
     {:response_code => response.code, :response_header => response, :response_body => (JSON.parse(response.body) rescue nil)}
   end
 
-  def create_event(params, message)
+  def create_event(params, message, custom_params = {})
     @token = get_token("user_device") unless @token_type=='user_device'
     if params[:event][:notification_type]=="push"
       if params[:event][:push_type]=="mpns"
@@ -547,11 +547,19 @@ class Quickblox
       end
 
       if params[:event][:push_type]=="apns"
-        to_send="payload=" + Base64.strict_encode64({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.to_json).to_s rescue nil
+        to_send="payload=" + Base64.strict_encode64(({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.merge(custom_params)).to_json).to_s rescue nil
       end
+
       if params[:event][:push_type]=="c2dm"
-        to_send="data.message=" + Base64.strict_encode64(message[:body]).to_s
+        encoded_custom_params = ''
+
+        custom_params.each do |key, value|
+          encoded_custom_params += ("data.#{key}" + Base64.strict_encode64(value).to_s)
+        end
+
+        to_send="data.message=" + Base64.strict_encode64(message[:body]).to_s + encoded_custom_params
       end
+
       if params[:event][:push_type]==nil
         to_send=Base64.strict_encode64(message[:body]).to_s
       end
