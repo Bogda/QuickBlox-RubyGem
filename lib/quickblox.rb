@@ -576,7 +576,7 @@ class Quickblox
     params.merge! "token" => @token
     normalized = normalize(params)
     req = Net::HTTP::Post.new(URI("http://"+@server.to_s+"/events.json").path)
-    req.body = "#{normalized}&event[message]=#{to_send}"
+    req.body = "#{normalized}&event[message]=#{CGI.escape(to_send)}"
     response=Net::HTTP.start(URI("http://"+@server.to_s).host) do |http|
       http.request(req)
     end
