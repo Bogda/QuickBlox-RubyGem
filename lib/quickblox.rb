@@ -550,7 +550,7 @@ class Quickblox
         to_send="payload=" + Base64.strict_encode64(({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.merge(custom_params)).to_json).to_s rescue nil
       end
 
-      if params[:event][:push_type]=="c2dm"
+      if params[:event][:push_type]=="gcm"
         encoded_custom_params = ''
 
         custom_params.each do |key, value|
@@ -642,7 +642,7 @@ class Quickblox
         to_send="payload=" + Base64.strict_encode64({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.to_json).to_s rescue nil
       end
 
-      if notification=="c2dm"
+      if notification=="gcm"
         to_send="data.message=" + Base64.strict_encode64(message[:body]).to_s
       end
 
