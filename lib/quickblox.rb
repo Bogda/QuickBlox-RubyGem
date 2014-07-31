@@ -547,17 +547,17 @@ class Quickblox
       end
 
       if params[:event][:push_type]=="apns"
-        to_send="payload=" + Base64.strict_encode64(({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.merge(custom_params)).to_json).to_s rescue nil
+        to_send=CGI::escape("payload=" + Base64.strict_encode64(({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.merge(custom_params)).to_json).to_s rescue nil)
       end
 
       if params[:event][:push_type]=="gcm"
         encoded_custom_params = ''
 
         custom_params.each do |key, value|
-          encoded_custom_params += ("data.#{key}" + Base64.strict_encode64(value).to_s)
+          encoded_custom_params += ("data.#{key}" + CGI::escape(Base64.strict_encode64(value).to_s))
         end
 
-        to_send="data.message=" + Base64.strict_encode64(message[:body]).to_s + encoded_custom_params
+        to_send="data.message=" + CGI::escape(Base64.strict_encode64(message[:body]).to_s) + encoded_custom_params
       end
 
       if params[:event][:push_type]==nil
@@ -576,7 +576,7 @@ class Quickblox
     params.merge! "token" => @token
     normalized = normalize(params)
     req = Net::HTTP::Post.new(URI("http://"+@server.to_s+"/events.json").path)
-    req.body = "#{normalized}&event[message]=#{CGI.escape(to_send)}"
+    req.body = "#{normalized}&event[message]=#{to_send}"
     response=Net::HTTP.start(URI("http://"+@server.to_s).host) do |http|
       http.request(req)
     end
