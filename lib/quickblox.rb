@@ -547,7 +547,7 @@ class Quickblox
       end
 
       if params[:event][:push_type]=="apns"
-        to_send=CGI::escape("payload=" + Base64.strict_encode64(({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.merge(custom_params)).to_json).to_s rescue nil)
+        to_send=CGI::escape("payload=" + Base64.strict_encode64(({:aps => {:alert => message[:alert], :badge => message[:badge_counter].to_i || 1, :sound => message[:sound] || 'default'}}.merge(custom_params)).to_json).to_s) rescue nil
       end
 
       if params[:event][:push_type]=="gcm"
