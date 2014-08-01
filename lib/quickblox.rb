@@ -565,7 +565,7 @@ class Quickblox
           encoded_custom_params += ("&data.#{key}=" + CGI::escape(Base64.strict_encode64(value).to_s))
         end
 
-        to_send="data.message=" + CGI::escape(Base64.strict_encode64(message[:body]).to_s) + encoded_custom_params
+        to_send=CGI::escape("data.message=" + CGI::escape(Base64.strict_encode64(message[:body]).to_s) + encoded_custom_params)
       end
 
       if params[:event][:push_type]==nil
