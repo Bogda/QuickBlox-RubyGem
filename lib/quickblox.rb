@@ -478,6 +478,14 @@ class Quickblox
     JSON.parse(response.body)
   end
 
+  def delete_push_token(push_token_id)
+    @token = get_token("user_device") unless @token_type=='user_device'
+    http = Net::HTTP.new(@server)
+    delete = Net::HTTP::Delete.new("/push_tokens/#{push_token_id}?token=#{@token}")
+    response = http.request(delete)
+    {:response_code => response.code, :response_header => response, :response_body => (JSON.parse(response.body) rescue nil)}
+  end
+
   def create_subscription (channels, url=nil)
     @token = get_token("user_device") unless @token_type=='user_device'
     hash={:notification_channels => "#{channels}", :url => "#{url}"}
@@ -554,7 +562,7 @@ class Quickblox
         encoded_custom_params = ''
 
         custom_params.each do |key, value|
-          encoded_custom_params += ("data.#{key}" + CGI::escape(Base64.strict_encode64(value).to_s))
+          encoded_custom_params += ("&data.#{key}=" + CGI::escape(Base64.strict_encode64(value).to_s))
         end
 
         to_send="data.message=" + CGI::escape(Base64.strict_encode64(message[:body]).to_s) + encoded_custom_params
